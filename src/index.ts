@@ -87,6 +87,38 @@ const products: Product[] = [
   },
 ];
 
+function generateProducts(count: number): Product[] {
+  const template = products[0];
+
+  const randomBase =
+    1_000_000_000 +
+    (crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000_000);
+
+  return Array.from({ length: count }, (_, index) => {
+    const productNumber = index + 1;
+    const price = Math.floor(Math.random() * 300) + 50;
+    const oldPrice = price + Math.floor(Math.random() * 200) + 10;
+
+    return {
+      ...template,
+
+      id: randomBase + index,
+
+      nameUa: `${template.nameUa} TEST ${productNumber}`,
+      nameRu: `${template.nameRu} TEST ${productNumber}`,
+
+      price,
+      oldPrice,
+
+      pictures: [...template.pictures],
+
+      params: template.params.map((param) => ({
+        ...param,
+      })),
+    };
+  });
+}
+
 export default {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -105,13 +137,15 @@ export default {
       ? Math.min(Math.max(requestedCount, 1), 1000)
       : 10;
 
+    const generatedProducts = generateProducts(count);
+
     const characteristic =
       url.searchParams.get("characteristic");
 
     const characteristicValue =
       url.searchParams.get("value");
 
-    let filteredProducts = products;
+    let filteredProducts = generatedProducts;
 
     if (characteristic) {
       filteredProducts = products.filter((product) =>
