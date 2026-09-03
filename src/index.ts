@@ -1,3 +1,5 @@
+// XML product feed worker
+
 const VALID_PORTAL_IDS = [562] as const;
 
 type PortalId = (typeof VALID_PORTAL_IDS)[number];
