@@ -114,6 +114,16 @@ function generatePicturesForProduct(): string[] {
   return pictures;
 }
 
+function hashSeed(seed: string): number {
+  let hash = 2166136261;
+
+  for (let i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
 
 // ======================================================
 // RANDOM PRODUCT GENERATION
@@ -121,14 +131,17 @@ function generatePicturesForProduct(): string[] {
 
 function generateProducts(
   count: number,
-  oversizedImage: boolean
+  oversizedImage: boolean,
+  idSeed: string | null
 ): Product[] {
   const template = products[0];
 
   const randomBase =
-    1_000_000_000 +
-    (crypto.getRandomValues(new Uint32Array(1))[0] %
-      1_000_000_000);
+  idSeed !== null
+    ? 1_000_000_000 + (hashSeed(idSeed) % 1_000_000_000)
+    : 1_000_000_000 +
+      (crypto.getRandomValues(new Uint32Array(1))[0] %
+        1_000_000_000);
 
   return Array.from({ length: count }, (_, index) => {
     const productNumber = index + 1;
@@ -210,7 +223,11 @@ export default {
     const oversizedImage =
       url.searchParams.get("oversizedImage") ===
       "true";
-
+    
+    const idSeed =
+      url.searchParams.get("idSeed");
+    
+    
 
     // --------------------------------------------------
     // GENERATE PRODUCTS
@@ -219,7 +236,8 @@ export default {
     const generatedProducts =
       generateProducts(
         count,
-        oversizedImage
+        oversizedImage,
+        idSeed
       );
 
 
