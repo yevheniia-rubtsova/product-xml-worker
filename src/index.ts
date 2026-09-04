@@ -3,6 +3,9 @@ const VALID_PORTAL_IDS = [562] as const;
 const OVERSIZED_IMAGE_URL =
   "https://raw.githubusercontent.com/yevheniia-rubtsova/product-xml-worker/refs/heads/main/test-assets/oversized-test-image.jpg";
 
+const MAIN_IMAGE_URL = 
+    "https://raw.githubusercontent.com/yevheniia-rubtsova/product-xml-worker/refs/heads/main/test-assets/main-test-image.jpg";
+
 type PortalId = (typeof VALID_PORTAL_IDS)[number];
 
 interface Product {
@@ -100,11 +103,15 @@ const products: Product[] = [
 function generatePicturesForProduct(): string[] {
   const imageCount = Math.floor(Math.random() * 12) + 1;
 
-  return Array.from(
-    { length: imageCount },
-    (_, index) =>
+  const pictures = [MAIN_IMAGE_URL];
+
+  for (let index = 1; index < imageCount; index++) {
+    pictures.push(
       `https://placehold.co/600x600.jpg?text=product-${index + 1}`
-  );
+    );
+  }
+
+  return pictures;
 }
 
 
